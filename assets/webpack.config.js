@@ -5,10 +5,15 @@ const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const glob = require('glob');
-const BabiliPlugin = require('babili-webpack-plugin');
+
+const MinifyPlugin = require('babel-minify-webpack-plugin');
+
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const DashboardPlugin = require('webpack-dashboard/plugin');
 const VENDOR_LIBS = ['vue'];
+
+// NEW
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+var CompressionPlugin = require("compression-webpack-plugin");
 
 
 function resolve(dir)
@@ -20,8 +25,8 @@ function resolve(dir)
 module.exports = {
     entry:
     {
-        app: './src/main.js',
-        vendor: VENDOR_LIBS
+        app: './src/main.js'
+        // vendor: VENDOR_LIBS
     },
     output:
     {
@@ -46,6 +51,10 @@ module.exports = {
                     {}
                 }
             },
+
+
+
+
             {
                 test: /\.(scss|sass|css)$/,
                 include: [
@@ -92,7 +101,10 @@ module.exports = {
                                     }),
                                     require('uncss').postcssPlugin({
 
-                                        html: [ 'http://localhost:4000' ],
+                                        html: [ 
+                                            'http://localhost:4000' 
+                                        ],
+
                                         ignore: [
                                         /nav/,
                                         /navbar/, 
@@ -102,9 +114,12 @@ module.exports = {
                                         /collapsing/, 
                                         /Toggle/,
                                         /click/, 
-                                        /hover/, 
+                                        /hover/,
+                                        /card/,
+                                        /card-body/,
+                                        /carousel/,
                                         '.hidden-xs',
-                                        '.fade'                                        
+                                        '.fade' 
                                         ],
                                         media: [
                                         '(min-width: 576px)',
@@ -137,6 +152,10 @@ module.exports = {
                     }]
                 })
             },
+
+
+
+
 
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
@@ -171,17 +190,29 @@ module.exports = {
         new webpack.ProvidePlugin(
         {   
             // inject ES5 modules as global vars
-            $: 'jquery',
-            jQuery: 'jquery',
-            JQuery: 'jquery',
-            Popper: 'popper.js'
-            //Tether: 'tether'
+            $: ['jquery/dist/jquery.slim.min.js'],
+            jQuery: ['jquery/dist/jquery.slim.min.js'],
+            JQuery: ['jquery/dist/jquery.slim.min.js'],
+            Popper: ['popper.js/dist/umd/popper.min.js']
         }),
         new CopyWebpackPlugin([
         {
             from: "./static"
         }]),
-        new DashboardPlugin()
+
+        new MinifyPlugin(),
+
+        new CompressionPlugin({
+              asset: "[path].gz[query]",
+              algorithm: "gzip",
+              test: /\.js$|\.css$|\.html$/,
+              threshold: 10240,
+              minRatio: 0
+            })
+
+        // turn this off before running the production version
+        // , new BundleAnalyzerPlugin()
+
         
     ],
     resolve:
@@ -197,11 +228,4 @@ module.exports = {
         }
     }
 };
-if (process.env.NODE_ENV === 'production')
-{
-    module.exports.plugins.push(
-        // minifier for JS files
-        // this takes ALOT OF TIME so only run it for production use
-        new BabiliPlugin()
-    )
-}
+
