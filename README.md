@@ -8,3 +8,5 @@ Starter template for:
 *  Webpack 3.8.1
 
 Vue code from Vue JS 2 - The Complete Guide (incl. Vue Router & Vuex)
+
+mix deps.get, then npm install in the assets directory
