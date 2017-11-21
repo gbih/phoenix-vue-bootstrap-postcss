@@ -5,7 +5,6 @@ const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const glob = require('glob');
-
 const MinifyPlugin = require('babel-minify-webpack-plugin');
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -200,15 +199,8 @@ module.exports = {
             from: "./static"
         }]),
 
-        new MinifyPlugin(),
 
-        new CompressionPlugin({
-              asset: "[path].gz[query]",
-              algorithm: "gzip",
-              test: /\.js$|\.css$|\.html$/,
-              threshold: 10240,
-              minRatio: 0
-            })
+
 
         // turn this off before running the production version
         // , new BundleAnalyzerPlugin()
@@ -227,5 +219,42 @@ module.exports = {
             '$': 'jquery'
         }
     }
+};
+
+
+
+if (process.env.NODE_ENV === 'production')
+{
+    module.exports.plugins.push(
+
+        // html-critical-webpack-plugin is an ES6 aware minifier from Babel
+        new MinifyPlugin({
+            booleans: true,
+            builtIns: true,
+            consecutiveAdds: true,
+            deadcode: true,
+            evaluate: true,
+            flipComparisons: true,
+            guards: true,
+            infinity: true,
+            memberExpressions: true,
+            numericLiterals: true,
+            propertyLiterals: true,
+            removeConsole: true,
+            removeDebugger: true,
+            simplify: true
+         }),
+
+
+        new CompressionPlugin({
+          asset: "[path].gz[query]",
+          algorithm: "gzip",
+          test: /\.js$|\.css$|\.html$/,
+          threshold: 10240,
+          minRatio: 0
+        })
+
+
+    )
 };
 

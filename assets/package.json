@@ -3,7 +3,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "MIX_ENV=dev webpack --progress --color --display-error-details",
-    "prod": "MIX_ENV=production webpack --display-error-details",
+    "prod": "MIX_ENV=production NODE_ENV=production webpack --display-error-details",
     "watch": "MIX_ENV=dev webpack --watch --display-error-details --progress --color",
     "hot": "NODE_ENV=development webpack-dev-server  --inline --hot"
   },
